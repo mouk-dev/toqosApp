@@ -11,7 +11,13 @@
 	$momoController = new MomoController();
 
 	// Fetch all data from the database
-	$momoData = $momoController->getAllAmounts();
+	// Filtrage
+	$statut = $_GET['statut'] ?? null;
+	$type = $_GET['type'] ?? null;
+	$date = $_GET['date'] ?? null;
+
+	$momoData = $momoController->getFilteredAmounts($_GET['statut'] ?? null, $_GET['type'] ?? null, $_GET['date'] ?? null);
+
 
 	// Calculate totals by type and statut
 	$totalEntrants = $momoController->getTotalByStatut('Entrant');
@@ -32,34 +38,25 @@
 	<div class="dashboard__container-elements">
 		<section id="view-momo" class="dashboard__section">
 			<h2 class="dashboard__title">Point détaillé de la momo</h2>
-			<div class="filters">
-				<label for="date-filter" class="filters__label"
-					>Filtrer par statut :</label
-				>
-				<select id="statut-momo" name="statut-momo" class="filters__input">
-					<option selected disabled> Sélectionner le statut</option>
-					<option value="Entrant"> Entrant</option>
-					<option value="Sortant">Sortant</option>
+			<form method="get" class="filters" style="display: flex; gap: 1rem; align-items: center;">
+				<select id="statut-momo" name="statut" class="filters__input">
+					<option value="">Tous les statuts</option>
+					<option value="Entrant" <?= ($_GET['statut'] ?? '') === 'Entrant' ? 'selected' : '' ?>>Entrant</option>
+					<option value="Sortant" <?= ($_GET['statut'] ?? '') === 'Sortant' ? 'selected' : '' ?>>Sortant</option>
 				</select>
-			</div>
 
-			<div class="filters">
-				<label for="date-filter" class="filters__label">Filtrer par type :</label>
-				<select id="type-momo" name="type-momo" class="filters__input">
-					<option selected disabled> Sélectionner le type de momo</option>
-					<option value="MTN">MTN</option>
-					<option value="MOOV">MOOV</option>
-					<option value="CELTIS">CELTIS</option>
-					<option value="CAISSE">CAISSE</option>
+				<select id="type-momo" name="type" class="filters__input">
+					<option value="">Tous les types</option>
+					<option value="MTN" <?= ($_GET['type'] ?? '') === 'MTN' ? 'selected' : '' ?>>MTN</option>
+					<option value="MOOV" <?= ($_GET['type'] ?? '') === 'MOOV' ? 'selected' : '' ?>>MOOV</option>
+					<option value="CELTIS" <?= ($_GET['type'] ?? '') === 'CELTIS' ? 'selected' : '' ?>>CELTIS</option>
+					<option value="CAISSE" <?= ($_GET['type'] ?? '') === 'CAISSE' ? 'selected' : '' ?>>CAISSE</option>
 				</select>
-			</div>
 
-			<div class="filters">
-				<label for="date-filter" class="filters__label"
-					>Filtrer par date :</label
-				>
-				<input type="date" name="date" id="date" class="filters__input" />
-			</div>
+				<input type="date" name="date" id="date" class="filters__input" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>" />
+
+				<button type="submit" class="btn-action btn-filter">Filtrer</button>
+			</form>
 
 			<table class="table">
 				<thead class="table__head">
@@ -72,6 +69,11 @@
 						<th class="table__cell">Actions</th>
 					</tr>
 				</thead>
+
+				<div id="spinner" style="display:none; text-align:center; padding:10px;">
+					<img src="../../assets/images/Rolling@1x-1.0s-200px-200px.gif" alt="Chargement..." width="40">
+				</div>
+
 				<tbody id="attendance-table" class="table__body">
 					<?php foreach ($momoData as $index => $row): ?>
 						<tr class="table__row">

@@ -11,7 +11,11 @@
 	$nairaController = new NairaController();
 
 	// Fetch all data from the database
-	$nairaData = $nairaController->getAllAmounts();
+	// Filtrage
+	$statut = $_GET['statut'] ?? null;
+	$date = $_GET['date'] ?? null;
+
+	$nairaData = $nairaController->getFilteredAmounts($_GET['statut'] ?? null, $_GET['date'] ?? null);
 
 	// Calculate totals by type and statut
 	$totalEntrants = $nairaController->getTotalByStatut('Entrant');
@@ -30,23 +34,18 @@
 	<div class="dashboard__container-elements">
 		<section id="view-naira" class="dashboard__section">
 			<h2 class="dashboard__title">Point détaillé de naïra</h2>
-			<div class="filters">
-				<label for="date-filter" class="filters__label"
-					>Filtrer par statut :</label
-				>
-				<select id="statut-naira" name="statut-naira" class="filters__input">
-					<option selected disabled> Sélectionner le statut</option>
-					<option value="Entrant"> Entrant</option>
-					<option value="Sortant">Sortant</option>
+			<form method="get" class="filters" style="display: flex; gap: 1rem; align-items: center;">
+				<select id="statut-naira" name="statut" class="filters__input">
+					<option value="">Tous les statuts</option>
+					<option value="Entrant" <?= ($_GET['statut'] ?? '') === 'Entrant' ? 'selected' : '' ?>>Entrant</option>
+					<option value="Sortant" <?= ($_GET['statut'] ?? '') === 'Sortant' ? 'selected' : '' ?>>Sortant</option>
 				</select>
-			</div>
 
-			<div class="filters">
-				<label for="date-filter" class="filters__label"
-					>Filtrer par date :</label
-				>
-				<input type="date" name="date" id="date" class="filters__input" />
-			</div>
+				<input type="date" name="date" id="date" class="filters__input" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>" />
+
+				<button type="submit" class="btn-action btn-filter">Filtrer</button>
+			</form>
+
 
 			<table class="table">
 				<thead class="table__head">
@@ -58,6 +57,11 @@
 						<th class="table__cell">Actions</th>
 					</tr>
 				</thead>
+
+				<div id="spinner" style="display:none; text-align:center; padding:10px;">
+					<img src="../../assets/images/Rolling@1x-1.0s-200px-200px.gif" alt="Chargement..." width="40">
+				</div>
+				
 				<tbody id="attendance-table" class="table__body">
 					<?php foreach ($nairaData as $index => $row): ?>
 						<tr class="table__row">

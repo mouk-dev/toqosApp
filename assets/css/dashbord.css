@@ -367,6 +367,14 @@ body {
 	outline: none;
 }
 
+.btn-filter{
+	background-color: #4154f1;
+}
+
+.btn-filter:hover{
+	background-color: #4153f19f;
+}
+
 /* TABLE BUTTON */
 .action-btn {
 	color: #fff;

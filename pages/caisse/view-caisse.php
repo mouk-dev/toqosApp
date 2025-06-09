@@ -11,7 +11,13 @@
 	$caisseController = new CaisseController();
 
 	// Fetch all data from the database
-	$caisseData = $caisseController->getAllAmounts();
+	// Filtrage
+	$statut = $_GET['statut'] ?? null;
+	$type = $_GET['type'] ?? null;
+	$date = $_GET['date'] ?? null;
+
+	$caisseData = $caisseController->getFilteredAmounts($_GET['statut'] ?? null, $_GET['type'] ?? null, $_GET['date'] ?? null);
+
 
 	// Calculate totals by type and statut
 	$totalEntrants = $caisseController->getTotalByStatut('Entrant');
@@ -34,33 +40,29 @@
 		<div class="dashboard__container-elements">
 			<section id="view-caisse" class="dashboard__section">
 				<h2 class="dashboard__title">Point détaillé de la caisse</h2>
-				<div class="filters">
-					<label for="date-filter" class="filters__label">Filtrer par statut :</label>
-					<select id="statut-caisse" name="statut-caisse" class="filters__input">
-						<option selected disabled> Sélectionner le statut</option>
-						<option value="Entrant"> Entrant</option>
-						<option value="Sortant">Sortant</option>
+				<form method="get" class="filters" style="display: flex; gap: 1rem; align-items: center;">
+					<select id="statut-caisse" name="statut" class="filters__input">
+						<option value="">Tous les statuts</option>
+						<option value="Entrant" <?= ($_GET['statut'] ?? '') === 'Entrant' ? 'selected' : '' ?>>Entrant</option>
+						<option value="Sortant" <?= ($_GET['statut'] ?? '') === 'Sortant' ? 'selected' : '' ?>>Sortant</option>
 					</select>
-				</div>
 
-				<div class="filters">
-					<label for="date-filter" class="filters__label">Filtrer par type :</label>
-					<select id="type-caisse" name="type-caisse" class="filters__input">
-						<option selected disabled> Sélectionner le type de caisse</option>
-						<option value="Western">Western</option>
-						<option value="Ria">Ria</option>
-						<option value="MoneyGramm">MoneyGramm</option>
-						<option value="C1">C1</option>
-						<option value="Momo">Momo</option>
+					<select id="type-caisse" name="type" class="filters__input">
+						<option value="">Tous les types</option>
+						<option value="Western" <?= ($_GET['type'] ?? '') === 'Western' ? 'selected' : '' ?>>Western</option>
+						<option value="Ria" <?= ($_GET['type'] ?? '') === 'Ria' ? 'selected' : '' ?>>Ria</option>
+						<option value="MoneyGramm" <?= ($_GET['type'] ?? '') === 'MoneyGramm' ? 'selected' : '' ?>>MoneyGramm</option>
+						<option value="C1" <?= ($_GET['type'] ?? '') === 'C1' ? 'selected' : '' ?>>C1</option>
+						<option value="Momo" <?= ($_GET['type'] ?? '') === 'Momo' ? 'selected' : '' ?>>Momo</option>
 					</select>
-				</div>
 
-				<div class="filters">
-					<label for="date-filter" class="filters__label">Filtrer par date :</label>
-					<input type="date" name="date" id="date" class="filters__input" />
-				</div>
+					<input type="date" name="date" id="date" class="filters__input" value="<?= htmlspecialchars($_GET['date'] ?? '') ?>" />
 
-				<table class="table">
+					<button type="submit" class="btn-action btn-filter">Filtrer</button>
+				</form>
+
+
+				<table class="table" >
 					<thead class="table__head">
 						<tr class="table__row">
 							<th class="table__cell">N°</th>
@@ -71,6 +73,11 @@
 							<th class="table__cell">Actions</th>
 						</tr>
 					</thead>
+
+					<div id="spinner" style="display:none; text-align:center; padding:10px;">
+						<img src="../../assets/images/Rolling@1x-1.0s-200px-200px.gif" alt="Chargement..." width="40">
+					</div>
+
 					<tbody id="attendance-table" class="table__body">
 						<?php foreach ($caisseData as $index => $row): ?>
 						<tr class="table__row">

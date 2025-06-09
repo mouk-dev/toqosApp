@@ -197,5 +197,43 @@
             $stmt = $db->query($query);
             return $stmt->fetch();
         }
+
+        /**
+         * Function to get filter amounts.
+         * @return array
+         */
+        public function getFilteredAmounts($statut = null, $type = null, $date = null)
+        {
+            $db = $this->connectDb();
+            $conditions = [];
+            $params = [];
+
+            if (!empty($statut)) {
+                $conditions[] = "statut = :statut";
+                $params['statut'] = $statut;
+            }
+
+            if (!empty($type)) {
+                $conditions[] = "type = :type";
+                $params['type'] = $type;
+            }
+
+            if (!empty($date)) {
+                $conditions[] = "DATE(date) = :date";
+                $params['date'] = $date;
+            }
+
+            $sql = "SELECT * FROM devise";
+            if (!empty($conditions)) {
+                $sql .= " WHERE " . implode(" AND ", $conditions);
+            }
+
+            $sql .= " ORDER BY date DESC";
+
+            $stmt = $db->prepare($sql);
+            $stmt->execute($params);
+
+            return $stmt->fetchAll();
+        }
     }
 ?>
