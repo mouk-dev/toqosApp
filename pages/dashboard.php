@@ -1,35 +1,86 @@
 <?php
+	ini_set('display_errors', 1);
+	ini_set('display_startup_errors', 1);
+	error_reporting(E_ALL);
+
 	require_once("header.php");
-	session_start();
-	if(!$_SESSION['userId']){
-		header("location: ../index.php");
-	}
+	require_once("testLogin.php");
+	require_once("caisse/CaisseController.php");
+	require_once("devise/DeviseController.php");
+	require_once("momo/MomoController.php");
+	require_once("naira/NairaController.php");
+
+	// Initialize the CaisseController
+	$caisseController = new CaisseController();
+
+	// Calculate totals by type and statut caisse
+	$totalEntrants = $caisseController->getTotalByStatut('Entrant');
+	$totalSortants = $caisseController->getTotalByStatut('Sortant');
+	$typeTotalsEntrants = $caisseController->getTotalsByTypeAndStatut('Entrant');
+	$typeTotalsSortants = $caisseController->getTotalsByTypeAndStatut('Sortant');
+	$totalGeneralEntrant = $caisseController->getGeneralTotal('Entrant');
+	$totalGeneralSortant = $caisseController->getGeneralTotal('Sortant');
+	$totalCaisse = $totalGeneralEntrant + $totalGeneralSortant;
+
+	// Initialize the DeviseController
+	$deviseController = new DeviseController();
+	
+	// Calculate totals by type and statut devise
+	$totalEntrants = $deviseController->getTotalByStatut('Entrant');
+	$totalSortants = $deviseController->getTotalByStatut('Sortant');
+	$typeTotalsEntrants = $deviseController->getTotalsByTypeAndStatut('Entrant');
+	$typeTotalsSortants = $deviseController->getTotalsByTypeAndStatut('Sortant');
+	$totalGeneralEntrant = $deviseController->getGeneralTotal('Entrant');
+	$totalGeneralSortant = $deviseController->getGeneralTotal('Sortant');
+	$totalDevise = $totalGeneralEntrant + $totalGeneralSortant;
+
+	// Initialize the MomoController
+	$momoController = new MomoController();
+
+	// Calculate totals by type and statut
+	$totalEntrants = $momoController->getTotalByStatut('Entrant');
+	$totalSortants = $momoController->getTotalByStatut('Sortant');
+	$typeTotalsEntrants = $momoController->getTotalsByTypeAndStatut('Entrant');
+	$typeTotalsSortants = $momoController->getTotalsByTypeAndStatut('Sortant');
+	$totalGeneralEntrant = $momoController->getGeneralTotal('Entrant');
+	$totalGeneralSortant = $momoController->getGeneralTotal('Sortant');
+	$totalMomo = $totalGeneralEntrant + $totalGeneralSortant;
+
+	// Initialize the NairaController
+	$nairaController = new NairaController();
+
+	// Calculate totals by type and statut
+	$totalEntrants = $nairaController->getTotalByStatut('Entrant');
+	$totalSortants = $nairaController->getTotalByStatut('Sortant');
+	$totalGeneralEntrant = $nairaController->getGeneralTotal('Entrant');
+	$totalGeneralSortant = $nairaController->getGeneralTotal('Sortant');
+	$totalNaira = $totalGeneralEntrant + $totalGeneralSortant;
 ?>
 <div class="dashboard__container">
 	<h1 class="dashboard__big-title">TOQOS à votre service.</h1>
 	<div class="dashboard__container-elements">
 		<div class="dashboard__elements-item">
-			<i class="fa-solid fa-folder dashboard__elements-icon"></i>
+			<i class="fas fa-cash-register dashboard__elements-icon"></i>
 			<h1 class="dashboard__elements-title">Caisses</h1>
-			<span class="dashboard__elements-static">12</span>
+			<span class="dashboard__elements-static"><?= number_format($totalCaisse, 0, ',', ' '); ?></span>
 		</div>
 
 		<div class="dashboard__elements-item">
-			<i class="fa-solid fa-list dashboard__elements-icon"></i>
+			<i class="fa-solid fa-money-bill dashboard__elements-icon"></i>
 			<h1 class="dashboard__elements-title">Momo</h1>
-			<span class="dashboard__elements-static">107</span>
+			<span class="dashboard__elements-static"><?= number_format($totalMomo, 0, ',', ' '); ?></span>
 		</div>
 
 		<div class="dashboard__elements-item">
-			<i class="fa-solid fa-users dashboard__elements-icon"></i>
+			<i class="fa-solid fa-coins dashboard__elements-icon"></i>
 			<h1 class="dashboard__elements-title">Devises</h1>
-			<span class="dashboard__elements-static">5</span>
+			<span class="dashboard__elements-static"><?= number_format($totalDevise, 0, ',', ' '); ?></span>
 		</div>
 
 		<div class="dashboard__elements-item">
-			<i class="fa-solid fa-users dashboard__elements-icon"></i>
-			<h1 class="dashboard__elements-title">Transferts</h1>
-			<span class="dashboard__elements-static">5</span>
+			<i class="fa-solid fa-right-left dashboard__elements-icon"></i>
+			<h1 class="dashboard__elements-title">Transferts Naïra</h1>
+			<span class="dashboard__elements-static"><?= number_format($totalNaira, 0, ',', ' '); ?></span>
 		</div>
 	</div>
 	<div class="dashboard__landing-container">
