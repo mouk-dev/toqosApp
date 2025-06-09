@@ -79,7 +79,7 @@
 
 		<div class="dashboard__elements-item">
 			<i class="fa-solid fa-right-left dashboard__elements-icon"></i>
-			<h1 class="dashboard__elements-title">Transferts Naïra</h1>
+			<h1 class="dashboard__elements-title">Naïra</h1>
 			<span class="dashboard__elements-static"><?= number_format($totalNaira, 0, ',', ' '); ?></span>
 		</div>
 	</div>
